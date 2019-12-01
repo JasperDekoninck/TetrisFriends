@@ -10,7 +10,7 @@ class SmallBlock:
         self.image = image
 
     def draw(self, screen, size_block):
-        pos = self.board.coordinateToPos(self.coordinate)
+        pos = self.board.coordinate_to_position(self.coordinate)
         screen.blit(pygame.transform.scale(self.image, (size_block, size_block)), (pos[0], pos[1]))
 
 
@@ -59,8 +59,8 @@ class Tetromino:
 
     def draw(self, screen, size_block):
         for co in self.get_all_coordinates():
-            pos = self.board.coordinateToPos(co)
-            screen.blit(pygame.transform.scale(self.image, (size_block, size_block)), (pos[0], pos[1]))
+            pos = self.board.coordinate_to_position(co)
+            screen.blit(pygame.transform.scale(self.image, (size_block, size_block)), pos)
 
 
 class Stick(Tetromino):

@@ -5,7 +5,6 @@ pygame.init()
 
 class Board:
 
-    POSSIBLE_BLOCKS = [HorseLeft, HorseRight, TetrisBlock, Square, Stick, LeftTurn, RightTurn]
     X_SIZE = 10
     Y_SIZE = 20
     COLORS = {
@@ -15,11 +14,10 @@ class Board:
         "light grey": (95, 105, 104)
     }
 
-    def __init__(self, player, size_per_block, left_top_position, screen_size):
+    def __init__(self, player, size_per_block, left_top_position):
         self.player = player
         self.size_per_block = size_per_block
         self.left_top_position = left_top_position
-        self.screen_size = screen_size
         self.moving_tetromino = None
 
         self.blocks_in_game = []
@@ -34,11 +32,11 @@ class Board:
         return True
 
     def coordinate_to_position(self, coordinate):
-        return [self.left_top_position[0] + self.size_per_block * coordinate[0] + 1,
-                self.left_top_position[1] + self.size_per_block * coordinate[1] + 1]
+        return [self.left_top_position[0] + self.size_per_block * coordinate[0],
+                self.left_top_position[1] + self.size_per_block * coordinate[1]]
 
-    def new_moving_tetromino(self):
-        self.moving_tetromino = self.player.get_next_block()
+    def new_moving_tetromino(self, next_tetromino):
+        self.moving_tetromino = next_tetromino
         self.moving_tetromino.coordinate = [int(self.X_SIZE / 2),
                                             -min([min(co) for co in self.moving_tetromino.shape])]
 
@@ -58,8 +56,15 @@ class Board:
             self.moving_tetromino.move(down=True)
         else:
             for co in self.moving_tetromino.get_all_coordinates():
-                self.blocks_in_game.append(SmallBlock(co, self.moving_tetromino.color, self))
+                self.blocks_in_game.append(SmallBlock(co, self.moving_tetromino.image, self))
             self.moving_tetromino = None
+
+    def move(self, left=False, right=False, down=False):
+        if self.moving_tetromino is not None and self.moving_tetromino.possible_to_move(left=left, right=right):
+            self.moving_tetromino.move(left=left, right=right)
+
+        if down:
+            self.move_down()
 
     def remove_full_line(self):
         for i, line in enumerate(self.board):
@@ -72,7 +77,7 @@ class Board:
 
     def update(self, down=True):
         if self.moving_tetromino is None:
-            self.new_moving_tetromino()
+            self.new_moving_tetromino(self.player.get_next_block())
         self.regenerate_board()
         if down:
             self.move_down()
@@ -84,10 +89,10 @@ class Board:
 
         coordinate_block = self.moving_tetromino.coordinate[:]
         for down_move in range(self.Y_SIZE):
-            self.moving_tetromino.coordinate += 1
+            self.moving_tetromino.coordinate[1] += 1
             if not self.is_valid_tetromino(self.moving_tetromino):
                 self.moving_tetromino.coordinate = coordinate_block
-                return coordinate_block[0], coordinate_block[1] + down_move
+                return [coordinate_block[0], coordinate_block[1] + down_move]
 
         return None
 
@@ -102,8 +107,7 @@ class Board:
             for coordinate in self.moving_tetromino.get_all_coordinates():
                 position = self.coordinate_to_position(coordinate)
                 pygame.draw.rect(screen, self.COLORS["light grey"],
-                                 tuple(position) + (self.size_per_block, self.size_per_block),
-                                 width=2)
+                                 tuple(position) + (self.size_per_block, self.size_per_block), 2)
 
             self.moving_tetromino.coordinate = old_coordinate
 
@@ -122,12 +126,12 @@ class Board:
         pygame.draw.rect(screen, self.COLORS["darkest grey"], (self.left_top_position[0], self.left_top_position[1],
                                                                self.X_SIZE * self.size_per_block,
                                                                self.Y_SIZE * self.size_per_block))
-
+        self.draw_background(screen)
         for block in self.blocks_in_game:
-            block.draw(screen)
+            block.draw(screen, self.size_per_block)
 
         if self.moving_tetromino is not None:
-            self.moving_tetromino.draw(screen)
+            self.moving_tetromino.draw(screen, self.size_per_block)
 
-        self.draw(screen)
-        self.draw_background(screen)
+        self.draw_projection(screen)
+
