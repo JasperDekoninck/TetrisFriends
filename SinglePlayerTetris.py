@@ -1,19 +1,16 @@
 from Player import Player
-from Board import Board
+from CONSTANTS import *
 import pygame
 import time
 pygame.init()
 
 
 class SinglePlayerTetris:
-    SIZE_PER_BLOCK = 20
-    DOWN_PER_SECOND = 3
-
     def __init__(self, screen, screen_size):
         self.screen = screen
         self.screen_size = screen_size
-        self.player = Player((self.screen_size[0] // 2 - Board.X_SIZE * self.SIZE_PER_BLOCK // 2, 100),
-                             self.SIZE_PER_BLOCK)
+        self.player = Player((self.screen_size[0] // 2 - X_SIZE * SINGLEPLAYERCONSTANTS.SIZE_PER_BLOCK // 2, 100),
+                             SINGLEPLAYERCONSTANTS.SIZE_PER_BLOCK)
         self.time_since_moving_down = time.time()
 
     def play(self):
@@ -23,11 +20,9 @@ class SinglePlayerTetris:
                 if event.type == pygame.QUIT:
                     quit()
 
-            if time.time() - self.time_since_moving_down > 1 / self.DOWN_PER_SECOND:
+            if time.time() - self.time_since_moving_down > 1 / SINGLEPLAYERCONSTANTS.DOWN_PER_SECOND:
                 self.player.update(down=True)
                 self.time_since_moving_down = time.time()
-            else:
-                self.player.update(down=False)
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:

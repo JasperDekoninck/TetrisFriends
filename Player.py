@@ -1,5 +1,6 @@
 from Board import Board
 from SideBoard import SideBoard
+from CONSTANTS import *
 import time
 
 
@@ -17,13 +18,12 @@ class Player:
         self.time_between_movements = 0.13
         self.time_between_turns = 0.2
 
-
-    def get_next_block(self):
-        return self.sideboard.get_next_block()
+    def get_next_tetromino(self):
+        return self.sideboard.get_next_tetromino()
 
     def draw(self, screen):
         self.board.draw(screen)
-        self.sideboard.draw(screen, self.pos, (self.pos[0] + self.board.X_SIZE * self.size_per_block, self.pos[1]),
+        self.sideboard.draw(screen, self.pos, (self.pos[0] + X_SIZE * self.size_per_block, self.pos[1]),
                             self.size_square)
 
     def move_tetromino(self, left=False, right=False, down=False):
@@ -40,7 +40,7 @@ class Player:
 
     def turn_tetromino(self):
         if time.time() - self.pressed_times[3] > self.time_between_turns:
-            self.board.moving_tetromino.turn()
+            self.board.turn()
             self.pressed_times[3] = time.time()
 
     def move_completely_down(self):
@@ -53,7 +53,7 @@ class Player:
             self.pressed_times[5] = time.time()
             self.sideboard.set_hold_block(self.board.moving_tetromino)
             if self.board.moving_tetromino is None:
-                self.board.moving_tetromino = self.get_next_block()
+                self.board.moving_tetromino = self.get_next_tetromino()
 
     def update(self, down=True):
         self.board.update(down)
