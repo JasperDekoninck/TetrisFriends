@@ -59,6 +59,7 @@ class Board:
         self.moving_tetromino = next_tetromino
         self.moving_tetromino.coordinate = [int(X_SIZE / 2),
                                             -min([min(co) for co in self.moving_tetromino.shape])]
+        self.moving_tetromino.board = self
 
         if not self.is_valid_tetromino(self.moving_tetromino):
             self.player.death = True
@@ -72,7 +73,7 @@ class Board:
             self.board[co[1]][co[0]] = self.moving_tetromino.id
 
         for block in self.blocks_in_game:
-            self.board[block.coordinate[1]][block.coordinate[0]] = -1
+            self.board[block.coordinate[1]][block.coordinate[0]] = block
 
     def move_down(self):
         """
@@ -106,28 +107,23 @@ class Board:
         if self.moving_tetromino is not None:
             self.moving_tetromino.turn()
 
-    def remove_block_with_id(self, iden):
-        """
-        Removes the block with the given id from the blocks_in_game list
-        :param iden: Negative int, the id of the block
-        """
-        for i, block in enumerate(self.blocks_in_game):
-            if block.id == iden:
-                self.blocks_in_game = self.blocks_in_game[:i] + self.blocks_in_game[i+1:]
-                break
-
     def remove_full_line(self):
         """
         Removes a line from the board if it's completely filled.
         :post If a given row is full of blocks, removes that row and moves all blocks on top of that row down
+        :post Adds a point to the player for each line made
         """
+        n_points_for_player = 100
         for i, line in enumerate(self.board):
-            if all([o < 0 for o in line]):
-                for iden in line:
-                    self.remove_block_with_id(iden)
+            if all([isinstance(o, Block) for o in line]):
+                for block in line:
+                    self.blocks_in_game.remove(block)
                 for block in self.blocks_in_game:
                     if block.coordinate[1] < i:
                         block.coordinate[1] += 1
+                self.player.points += n_points_for_player
+                self.player.lines += 1
+                n_points_for_player += 100
 
     def update(self, down=True):
         """

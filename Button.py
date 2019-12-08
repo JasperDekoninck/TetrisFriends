@@ -34,12 +34,13 @@ class Button:
     def update_selected(self, pos):
         self.selected = self.is_selected(pos)
 
-    def render(self, screen, camera_pos=np.zeros(2)):
+    def render(self, screen, pos=np.zeros(2)):
+        pos = np.array(pos)
         if not self.selected or self.hover_over_content is None:
-            position = (self.pos[0] - camera_pos[0].astype(np.int32), self.pos[1] - camera_pos[1].astype(np.int32))
+            position = (self.pos[0] + pos[0].astype(np.int32), self.pos[1] + pos[1].astype(np.int32))
             screen.blit(self.content, position)
         else:
-            screen.blit(self.hover_over_content, self.pos - camera_pos.astype(np.int32))
+            screen.blit(self.hover_over_content, self.pos - pos.astype(np.int32))
 
 
 class TextButton(Button):
@@ -64,7 +65,18 @@ class TextButton(Button):
             self.hover_over_content = self.font.render(new_text, True, self.color_selected)
 
 
-class ImageButton(Button):
-    def __init__(self, pos, content, description):
-        super(ImageButton, self).__init__(pos, content)
-        self.description = description
+class InputField:
+    def __init__(self, pos, question, size, color, center_pos=True):
+        self.question = TextButton(pos, question, size, color, center_pos=center_pos)
+        self.input = TextButton([pos[0], pos[1] + self.question.content.get_size()[1]],
+                                "", size, color, center_pos=center_pos)
+
+    def new_input_letter(self, new_letter=None):
+        if new_letter is None:
+            self.input.set_text(self.input.message[:-1])
+        else:
+            self.input.set_text(self.input.message + new_letter)
+
+    def render(self, screen):
+        self.question.render(screen)
+        self.input.render(screen)

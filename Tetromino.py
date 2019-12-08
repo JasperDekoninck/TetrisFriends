@@ -49,6 +49,9 @@ class Tetromino:
         self.shape = []
         self.image = image
 
+        # If a block has already been put on hold, it cannot be again put on hold
+        self.holdable = True
+
         # id uniquely identifying the given tetromino
         self.id = self.NEXT_ID
         self.NEXT_ID += 1
