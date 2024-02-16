@@ -32,11 +32,11 @@ class HighScoreMenu:
                                             center_pos=True)
 
     def read_highscore_file(self):
-        with open("highscores.pkl", "rb") as f:
+        with open("highscore.pkl", "rb") as f:
             return pickle.load(f)
 
     def write_highscore(self):
-        pickle.dump(self.highscores, open("highscores.pkl", "wb"))
+        pickle.dump(self.highscores, open("highscore.pkl", "wb"))
 
     def insert_points(self, points, name):
         scores = [int(highscore.split(" ")[-1]) for highscore in self.highscores]
