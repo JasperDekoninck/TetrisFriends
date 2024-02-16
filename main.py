@@ -1,7 +1,4 @@
-from SinglePlayerTetris import SinglePlayerTetris
-from MainMenu import MainMenu
-from GameOverMenu import GameOverMenu
-from HighScoreMenu import HighScoreMenu
+from tetris import SinglePlayerTetris, MainMenu, GameOverMenu, HighScoreMenu
 import pygame
 pygame.init()
 
